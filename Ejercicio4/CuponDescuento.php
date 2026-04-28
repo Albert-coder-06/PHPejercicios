@@ -4,15 +4,14 @@ class CuponDescuento {
 
     private const PORCENTAJE = 0.20;
 
-    public function aplicarPorcentaje(Carrito $carrito) {
+    public function aplicarPorcentaje(float $totalCarrito) {
 
-        $totalCarrito = $carrito->getTotal();
 
-        if ($totalCarrito < 0 || $totalCarrito > 50) {
+        if ($totalCarrito < 50) {
             return false;
         } else {
-            $totalPrecioConDescuento = + $totalCarrito + $totalCarrito * self::PORCENTAJE;
-             $carrito->setPrice($totalPrecioConDescuento);
+            $totalPrecioConDescuento = (float)$totalCarrito - $totalCarrito * self::PORCENTAJE;
+            return $totalPrecioConDescuento;
         }
 
     }

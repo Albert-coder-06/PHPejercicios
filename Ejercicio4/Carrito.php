@@ -1,9 +1,32 @@
 <?php
     include_once 'Producto.php';
+    include_once 'CuponDescuento.php';
 
     class Carrito {
         private $productos = [];
         private $total;
+
+        private $cuponDescuento = null;
+
+
+        public function aplicarCuponDescuento (CuponDescuento $cupon) {
+            
+            if ($this->cuponDescuento) {
+                return false;
+            }
+
+            $result = $cupon->aplicarPorcentaje($this->total);
+
+            if ($result) {
+                $this->cuponDescuento = $cupon;
+                $this->total = $result;
+                return true;
+            } else {
+                return false;
+            }
+
+        }
+
 
         public function agregarProducto(Producto $producto, int $cantidad = 1) {
 
@@ -20,10 +43,10 @@
                 $this->productos[] = $producto;
             }
 
+
             $this->total = $this->getTotal();
 
             return true;
-
 
 
         }
@@ -55,6 +78,8 @@
                     return $value->getId() !== $id;
                 });
 
+                $this->total = $this->getTotal();
+
                 return true;
             } else {
                 return false;
@@ -66,11 +91,11 @@
                 return $carry += $item->getPrecio() * $item->getCantidad();
             }, 0);
 
-            return (float)$result;
-        }
+            if ($this->cuponDescuento) {
+                return (float)$this->cuponDescuento->aplicarPorcentaje($result);
+            }
 
-        public function setPrice(float $price) {
-            $this->total = $price;
+            return (float)$result;
         }
 
         public function getCarrito() {
