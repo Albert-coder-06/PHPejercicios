@@ -39,9 +39,8 @@
 
             if ($formatedResponse) {
                 $this->payments[] = $newTransaction;
-
-                
-
+                //Añadir log al sistema sobre la transaccion
+                $addLog = $this->generateLog($newTransaction);
                 return $formatedResponse;
 
             }
@@ -86,7 +85,29 @@
 
         }
 
+        private function generateLog(array $transactionData) {
+
+            $year = date('Y');
+            $month = date('m');
+            $day = date('d');
+            $directory = __DIR__."/logs/$year/$month";
+
+            if (!is_dir($directory)) {
+                mkdir($directory, 0777, true);
+            }
+            
+            $fileName = "$directory/$day.txt";
+
+            $logContent = "ID: ". $transactionData['transaction_id'] . "\n" . 
+                        "Message: " . $transactionData['message'] . "\n" .
+                        "Date: " . $transactionData['timestamp'] . "\n" . 
+                        "Status: " . $transactionData['status'] . "\n" . 
+                        "Currency: " . $transactionData['currency'] . "\n\n";
+
+
+            return file_put_contents($fileName, $logContent, FILE_APPEND);
         
+        }
 
     }
 
